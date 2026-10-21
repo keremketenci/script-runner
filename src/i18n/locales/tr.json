@@ -1,0 +1,13 @@
+{
+  "settings": {
+    "title": "Ayarlar",
+    "description": "Uygulamayı özelleştir.",
+    "language": "Dil",
+    "theme": "Tema"
+  },
+  "theme": {
+    "light": "Açık",
+    "dark": "Koyu",
+    "system": "Sistem"
+  }
+}
