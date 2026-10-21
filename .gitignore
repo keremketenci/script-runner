@@ -23,5 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 
-# Local AI assistant instructions
+# Local AI assistant instructions and settings
 CLAUDE.md
+.claude/
