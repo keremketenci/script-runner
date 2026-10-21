@@ -9,5 +9,10 @@
     "light": "Light",
     "dark": "Dark",
     "system": "System"
+  },
+  "terminal": {
+    "startFailed": "Could not start the script: {{error}}",
+    "exited": "Script exited with code {{code}}.",
+    "restart": "Restart"
   }
 }

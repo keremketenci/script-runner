@@ -9,5 +9,10 @@
     "light": "Açık",
     "dark": "Koyu",
     "system": "Sistem"
+  },
+  "terminal": {
+    "startFailed": "Script başlatılamadı: {{error}}",
+    "exited": "Script {{code}} koduyla sonlandı.",
+    "restart": "Yeniden başlat"
   }
 }
