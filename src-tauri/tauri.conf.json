@@ -32,6 +32,11 @@
       "icons/128x128@2x.png",
       "icons/icon.icns",
       "icons/icon.ico"
-    ]
+    ],
+    "category": "DeveloperTool",
+    "publisher": "Kerem Ketenci",
+    "copyright": "Copyright © 2026 Kerem Ketenci",
+    "shortDescription": "Browse and run your personal scripts from one place",
+    "longDescription": "A desktop app for browsing script folders and running scripts in an embedded terminal, with run settings, sequences and a run history."
   }
 }
