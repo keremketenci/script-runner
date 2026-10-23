@@ -196,6 +196,13 @@ pub fn start_session(
     if let Some(folder) = &working_folder {
         command.cwd(folder);
     }
+    // Scripts get the app's environment, minus what an AppImage put into it
+    for change in runner::script_environment() {
+        match change {
+            runner::EnvChange::Set(name, value) => command.env(name, value),
+            runner::EnvChange::Remove(name) => command.env_remove(name),
+        }
+    }
     command.env("TERM", "xterm-256color");
     command.env("PATH", runner::search_path());
 

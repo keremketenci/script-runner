@@ -144,10 +144,78 @@ fn extra_folders() -> Vec<PathBuf> {
     Vec::new()
 }
 
+/// A change to the environment a script inherits from the app.
+#[derive(Debug, PartialEq)]
+pub enum EnvChange {
+    Set(OsString, OsString),
+    Remove(OsString),
+}
+
+/// Undoes what an AppImage adds to the environment. The AppImage starter points variables
+/// such as PYTHONHOME, PYTHONPATH and LD_LIBRARY_PATH into its own mount folder (`APPDIR`),
+/// which breaks the system's programs: python3 then looks for its standard library inside
+/// the AppImage. Variables that point into `app_folder` are removed; path lists such as
+/// PATH or XDG_DATA_DIRS keep only their entries outside it.
+fn undo_app_folder(
+    variables: impl Iterator<Item = (OsString, OsString)>,
+    app_folder: &Path,
+) -> Vec<EnvChange> {
+    let mut changes = Vec::new();
+    for (name, value) in variables {
+        // The AppImage's own markers, and two GTK settings its GTK hook forces for the app
+        // (GDK_BACKEND=x11 and a GTK_THEME) that should not leak into programs scripts open
+        if ["APPDIR", "APPIMAGE", "ARGV0", "GDK_BACKEND", "GTK_THEME"]
+            .iter()
+            .any(|marker| name == *marker)
+        {
+            changes.push(EnvChange::Remove(name));
+            continue;
+        }
+        let parts: Vec<PathBuf> = std::env::split_paths(&value).collect();
+        if !parts.iter().any(|part| part.starts_with(app_folder)) {
+            continue;
+        }
+        // Empty parts (from a trailing ":") are dropped too; they would mean "current folder"
+        let kept: Vec<PathBuf> = parts
+            .into_iter()
+            .filter(|part| !part.as_os_str().is_empty() && !part.starts_with(app_folder))
+            .collect();
+        match std::env::join_paths(&kept) {
+            Ok(joined) if !kept.is_empty() => changes.push(EnvChange::Set(name, joined)),
+            _ => changes.push(EnvChange::Remove(name)),
+        }
+    }
+    changes
+}
+
+/// How the app's own environment has to change before it is handed to a script.
+/// Empty unless the app runs from an AppImage.
+pub fn script_environment() -> Vec<EnvChange> {
+    match std::env::var_os("APPDIR") {
+        Some(app_folder) if !app_folder.is_empty() => {
+            undo_app_folder(std::env::vars_os(), Path::new(&app_folder))
+        }
+        _ => Vec::new(),
+    }
+}
+
+/// The app's PATH as scripts should see it, without AppImage entries.
+fn inherited_path() -> Option<OsString> {
+    let path = std::env::var_os("PATH")?;
+    for change in script_environment() {
+        match change {
+            EnvChange::Set(name, value) if name == "PATH" => return Some(value),
+            EnvChange::Remove(name) if name == "PATH" => return None,
+            _ => {}
+        }
+    }
+    Some(path)
+}
+
 /// PATH plus the extra folders that exist and are not on it yet. Used to find
 /// interpreters and handed to scripts, so tools they call are found the same way.
 pub fn search_path() -> OsString {
-    let mut folders: Vec<PathBuf> = std::env::var_os("PATH")
+    let mut folders: Vec<PathBuf> = inherited_path()
         .map(|path| std::env::split_paths(&path).collect())
         .unwrap_or_default();
     for folder in extra_folders() {
@@ -327,6 +395,43 @@ mod tests {
         );
         assert!(split_args("   ").unwrap().is_empty());
         assert!(split_args(r#"say "hello"#).is_err());
+    }
+
+    #[test]
+    fn appimage_variables_are_removed_or_cleaned() {
+        let app_folder = Path::new("/tmp/.mount_scriptAbc");
+        let variables = [
+            ("PYTHONHOME", "/tmp/.mount_scriptAbc/usr/"),
+            ("PYTHONPATH", "/tmp/.mount_scriptAbc/usr/share/pyshared/:"),
+            (
+                "PATH",
+                "/tmp/.mount_scriptAbc/usr/bin:/usr/local/bin:/usr/bin",
+            ),
+            (
+                "XDG_DATA_DIRS",
+                "/tmp/.mount_scriptAbc/usr/share:/usr/share",
+            ),
+            ("APPDIR", "/tmp/.mount_scriptAbc"),
+            ("GDK_BACKEND", "x11"),
+            ("HOME", "/home/someone"),
+            ("LANG", "tr_TR.UTF-8"),
+        ]
+        .map(|(name, value)| (OsString::from(name), OsString::from(value)));
+
+        let changes = undo_app_folder(variables.into_iter(), app_folder);
+        let set = |name: &str, value: &str| EnvChange::Set(name.into(), value.into());
+        let remove = |name: &str| EnvChange::Remove(name.into());
+        assert_eq!(
+            changes,
+            [
+                remove("PYTHONHOME"),
+                remove("PYTHONPATH"),
+                set("PATH", "/usr/local/bin:/usr/bin"),
+                set("XDG_DATA_DIRS", "/usr/share"),
+                remove("APPDIR"),
+                remove("GDK_BACKEND"),
+            ]
+        );
     }
 
     #[test]
