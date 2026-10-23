@@ -103,6 +103,8 @@ Appearance settings (theme, language, sizes) are stored in the window's local st
 - `minecraft/ban/`: a three-step sequence for a Minecraft server: `merge_logs.py` merges
   the `logs/` folder into `merged-logs.txt`, `find_failed_logins.py` collects the IPs of
   failed logins, `update_ban_list.py` adds new ones to `ban_list.txt`.
+  `remove_duplicate_ips.py` removes repeated IPs from `failed_ips.txt`, for example after
+  editing it by hand or appending to it from other sources.
   Real logs are not part of the repository; put your server's `logs/` folder next to the scripts.
 
 ## Development
