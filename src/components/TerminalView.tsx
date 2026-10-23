@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Play, RotateCcw, Square } from "lucide-react";
 import { Channel, invoke } from "@tauri-apps/api/core";
@@ -8,6 +8,7 @@ import "@xterm/xterm/css/xterm.css";
 import { cn } from "cn";
 import { Button } from "@/shadcn/ui/button";
 import i18n from "@/i18n";
+import type { Outcome } from "@/lib/history";
 
 // Background colors match the app's own --background in each theme
 const DARK_THEME: ITheme = {
@@ -65,6 +66,17 @@ export interface RunRequest extends RunTarget {
   id: number;
 }
 
+/** How a run ended, reported to the parent so it can be saved in the history. */
+export interface RunResult {
+  outcome: Outcome;
+  /** Exit code of the last step that ran, if it exited by itself */
+  code: number | null;
+  /** The step (from 1) the run ended on */
+  stepNumber: number;
+  startedAt: number;
+  endedAt: number;
+}
+
 /** Which step of a sequence is meant; numbers start at 1. */
 interface StepInfo {
   number: number;
@@ -87,7 +99,7 @@ type RunStatus =
   | (StatusBase & { kind: "failed" });
 
 /** "0:07", "12:34" or "1:02:03". */
-function formatDuration(milliseconds: number) {
+export function formatDuration(milliseconds: number) {
   const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000));
   const hours = Math.floor(totalSeconds / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
@@ -101,9 +113,11 @@ interface StatusBarProps {
   status: RunStatus;
   onStop: () => void;
   onRunAgain: () => void;
+  /** Extra controls on the right, shown in every state (the history menu) */
+  extra?: ReactNode;
 }
 
-function StatusBar({ status, onStop, onRunAgain }: StatusBarProps) {
+function StatusBar({ status, onStop, onRunAgain, extra }: StatusBarProps) {
   const { t } = useTranslation();
   // Ticks once a second while a script runs, so the elapsed time stays current
   const [now, setNow] = useState(Date.now());
@@ -116,8 +130,9 @@ function StatusBar({ status, onStop, onRunAgain }: StatusBarProps) {
 
   if (status.kind === "idle") {
     return (
-      <div className="flex h-10 items-center border-b px-3 text-sm text-muted-foreground">
-        {t("status.idle")}
+      <div className="flex h-10 items-center gap-2 border-b px-3 text-sm">
+        <span className="truncate text-muted-foreground">{t("status.idle")}</span>
+        <div className="ml-auto flex shrink-0 gap-1">{extra}</div>
       </div>
     );
   }
@@ -167,6 +182,7 @@ function StatusBar({ status, onStop, onRunAgain }: StatusBarProps) {
         </span>
       )}
       <div className="ml-auto flex shrink-0 gap-1">
+        {extra}
         {status.kind === "running" ? (
           <Button size="sm" variant="outline" onClick={onStop}>
             <Square />
@@ -185,13 +201,15 @@ function StatusBar({ status, onStop, onRunAgain }: StatusBarProps) {
 
 interface TerminalViewProps {
   run: RunRequest | null;
-  /** Called when the run ends (last exit code, or `null` if a script could not start) */
-  onFinished: (code: number | null) => void;
+  /** Called once when the run ends, however it ended */
+  onFinished: (result: RunResult) => void;
   /** Starts the last script or sequence again */
   onRunAgain: () => void;
+  /** Shown in the status bar, see StatusBarProps.extra */
+  statusExtra?: ReactNode;
 }
 
-export function TerminalView({ run, onFinished, onRunAgain }: TerminalViewProps) {
+export function TerminalView({ run, onFinished, onRunAgain, statusExtra }: TerminalViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const terminalRef = useRef<Terminal | null>(null);
   const [status, setStatus] = useState<RunStatus>({ kind: "idle" });
@@ -283,10 +301,10 @@ export function TerminalView({ run, onFinished, onRunAgain }: TerminalViewProps)
     terminal.reset();
     terminal.focus();
 
-    const finish = (code: number | null) => {
+    const finish = (outcome: Outcome, code: number | null, stepNumber: number) => {
       terminal.writeln(`\x1b[2m${i18n.t("terminal.clearHint")}\x1b[0m`);
       exitedRef.current = true;
-      onFinishedRef.current(code);
+      onFinishedRef.current({ outcome, code, stepNumber, startedAt, endedAt: Date.now() });
     };
 
     // Runs one step; when it exits with code 0 the next one starts in the same terminal
@@ -298,7 +316,7 @@ export function TerminalView({ run, onFinished, onRunAgain }: TerminalViewProps)
       if (stopRequested()) {
         terminal.writeln(`\r\n\x1b[33m${i18n.t("terminal.stopped")}\x1b[0m`);
         setStatus({ ...base, step, kind: "stopped", startedAt, endedAt: Date.now() });
-        finish(null);
+        finish("stopped", null, step.number);
         return;
       }
 
@@ -321,7 +339,7 @@ export function TerminalView({ run, onFinished, onRunAgain }: TerminalViewProps)
         if (stopRequested()) {
           terminal.writeln(`\r\n\x1b[33m${i18n.t("terminal.stopped")}\x1b[0m`);
           setStatus({ ...base, step, kind: "stopped", startedAt, endedAt });
-          finish(code);
+          finish("stopped", null, step.number);
           return;
         }
         // Green for success, red for failure, then reset the color
@@ -340,7 +358,7 @@ export function TerminalView({ run, onFinished, onRunAgain }: TerminalViewProps)
           terminal.writeln(summary);
         }
         setStatus({ ...base, step, kind: "finished", startedAt, endedAt, code });
-        finish(code);
+        finish("finished", code, step.number);
       };
 
       invoke("start_session", {
@@ -353,7 +371,7 @@ export function TerminalView({ run, onFinished, onRunAgain }: TerminalViewProps)
         if (!isCurrent()) return;
         terminal.writeln(`\x1b[31m${i18n.t("terminal.startFailed", { error: String(error) })}\x1b[0m`);
         setStatus({ ...base, step, kind: "failed" });
-        finish(null);
+        finish("failed", null, step.number);
       });
     };
 
@@ -367,7 +385,7 @@ export function TerminalView({ run, onFinished, onRunAgain }: TerminalViewProps)
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border">
-      <StatusBar status={status} onStop={stop} onRunAgain={onRunAgain} />
+      <StatusBar status={status} onStop={stop} onRunAgain={onRunAgain} extra={statusExtra} />
       {/* Same background as the terminal theme, so the padding blends in */}
       <div className="min-h-0 flex-1 bg-white p-2 dark:bg-[#0a0a0a]">
         <div ref={containerRef} className="size-full" />

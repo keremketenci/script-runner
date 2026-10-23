@@ -139,5 +139,23 @@
   },
   "layout": {
     "resizeTerminal": "Drag to resize the terminal (double-click resets)"
+  },
+  "history": {
+    "title": "History",
+    "empty": "No runs yet",
+    "runAgain": "Run again",
+    "clear": "Clear history",
+    "stopped": "stopped",
+    "failed": "could not start",
+    "exitCode": "code {{code}}",
+    "failedAtStep": "step {{number}}, code {{code}}",
+    "clearTitle": "Clear history?",
+    "clearText_one": "{{count}} run will be removed from the list. Your scripts are not touched.",
+    "clearText_other": "{{count}} runs will be removed from the list. Your scripts are not touched."
+  },
+  "crash": {
+    "title": "Something went wrong",
+    "text": "Part of the window crashed. Reloading usually fixes it; a running script is stopped.",
+    "reload": "Reload"
   }
 }

@@ -4,6 +4,7 @@ use std::io::ErrorKind;
 use std::path::{Component, Path, PathBuf};
 use std::time::{SystemTime, UNIX_EPOCH};
 
+use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Manager};
 
@@ -315,34 +316,40 @@ fn check_folder(path: &Path) -> Result<(), String> {
     Ok(())
 }
 
-/// Reads the config file. A missing file is not an error: it means first launch.
-fn load_from(path: &Path) -> Result<Config, String> {
+/// Reads a JSON file of the app. A missing file is not an error: it means first launch.
+/// Generic, so the same code reads `Config` and the run history.
+pub(crate) fn load_from<T: DeserializeOwned + Default>(path: &Path) -> Result<T, String> {
     match fs::read_to_string(path) {
         Ok(text) => serde_json::from_str(&text)
             .map_err(|error| format!("{} is not valid: {error}", path.display())),
-        Err(error) if error.kind() == ErrorKind::NotFound => Ok(Config::default()),
+        Err(error) if error.kind() == ErrorKind::NotFound => Ok(T::default()),
         Err(error) => Err(format!("could not read {}: {error}", path.display())),
     }
 }
 
-/// Writes the config file. Writes to a temporary file first and then renames it,
-/// so a crash halfway through never leaves a half-written config behind.
-fn save_to(path: &Path, config: &Config) -> Result<(), String> {
+/// Writes a JSON file of the app. Writes to a temporary file first and then renames it,
+/// so a crash halfway through never leaves a half-written file behind.
+pub(crate) fn save_to<T: Serialize>(path: &Path, value: &T) -> Result<(), String> {
     if let Some(folder) = path.parent() {
         fs::create_dir_all(folder).map_err(|error| error.to_string())?;
     }
-    let text = serde_json::to_string_pretty(config).map_err(|error| error.to_string())?;
+    let text = serde_json::to_string_pretty(value).map_err(|error| error.to_string())?;
     let temporary = path.with_extension("json.tmp");
     fs::write(&temporary, text).map_err(|error| error.to_string())?;
     fs::rename(&temporary, path).map_err(|error| error.to_string())
 }
 
-fn config_path(app: &AppHandle) -> Result<PathBuf, String> {
+/// Full path of one of the app's files in the app data dir.
+pub(crate) fn data_file(app: &AppHandle, name: &str) -> Result<PathBuf, String> {
     let folder = app
         .path()
         .app_data_dir()
         .map_err(|error| error.to_string())?;
-    Ok(folder.join(CONFIG_FILE))
+    Ok(folder.join(name))
+}
+
+fn config_path(app: &AppHandle) -> Result<PathBuf, String> {
+    data_file(app, CONFIG_FILE)
 }
 
 pub fn load(app: &AppHandle) -> Result<Config, String> {
@@ -474,7 +481,10 @@ mod tests {
     #[test]
     fn missing_file_gives_default_config() {
         let folder = test_folder("missing");
-        assert_eq!(load_from(&folder.join(CONFIG_FILE)), Ok(Config::default()));
+        assert_eq!(
+            load_from::<Config>(&folder.join(CONFIG_FILE)),
+            Ok(Config::default())
+        );
     }
 
     #[test]
@@ -486,14 +496,14 @@ mod tests {
 
         let path = folder.join(CONFIG_FILE);
         save_to(&path, &config).unwrap();
-        assert_eq!(load_from(&path), Ok(config));
+        assert_eq!(load_from::<Config>(&path), Ok(config));
     }
 
     #[test]
     fn invalid_json_is_an_error() {
         let path = test_folder("invalid").join(CONFIG_FILE);
         fs::write(&path, "{ not json").unwrap();
-        assert!(load_from(&path).is_err());
+        assert!(load_from::<Config>(&path).is_err());
     }
 
     #[test]
@@ -567,7 +577,7 @@ mod tests {
 
         let path = folder.join(CONFIG_FILE);
         save_to(&path, &config).unwrap();
-        assert_eq!(load_from(&path), Ok(config.clone()));
+        assert_eq!(load_from::<Config>(&path), Ok(config.clone()));
 
         config.set_alias(script.clone(), Some("   ")).unwrap();
         assert!(config.aliases.is_empty());
@@ -681,7 +691,7 @@ mod tests {
         config.create_sequence("Logs").unwrap();
         let path = folder.join(CONFIG_FILE);
         save_to(&path, &config).unwrap();
-        assert_eq!(load_from(&path), Ok(config));
+        assert_eq!(load_from::<Config>(&path), Ok(config));
     }
 
     /// Pretends every program name exists, except "missing"

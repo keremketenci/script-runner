@@ -19,7 +19,14 @@ import { FolderSidebar } from "@/components/FolderSidebar";
 import { SequenceEditor } from "@/components/SequenceEditor";
 import { SequenceSidebar } from "@/components/SequenceSidebar";
 import { SettingsPanel } from "@/components/SettingsPanel";
-import { TerminalView, type RunRequest, type RunTarget } from "@/components/TerminalView";
+import { HistoryMenu } from "@/components/HistoryMenu";
+import {
+  TerminalView,
+  type RunRequest,
+  type RunResult,
+  type RunTarget,
+} from "@/components/TerminalView";
+import { clearHistory, getHistory, recordRun, type HistoryEntry } from "@/lib/history";
 import type { Entry } from "@/lib/browser";
 import {
   addSequenceStep,
@@ -49,6 +56,29 @@ export default function App() {
   const [location, setLocation] = useState<string | null>(null);
 
   const [running, setRunning] = useState(false);
+  // Recent runs, newest first, from history.json
+  const [history, setHistory] = useState<HistoryEntry[]>([]);
+  useEffect(() => {
+    getHistory()
+      .then(setHistory)
+      .catch((error) => console.error(error));
+  }, []);
+
+  // Saves how the run ended; the output itself is never stored
+  const finishRun = (result: RunResult) => {
+    setRunning(false);
+    setFilesChanged((previous) => previous + 1);
+    if (!run) return;
+    const entry: HistoryEntry = {
+      name: run.name,
+      isSequence: run.isSequence,
+      steps: run.steps,
+      ...result,
+    };
+    recordRun(entry)
+      .then(setHistory)
+      .catch((error) => console.error(error));
+  };
   // Something the user wants to start while another run is still going
   const [pendingRun, setPendingRun] = useState<RunTarget | null>(null);
 
@@ -247,10 +277,20 @@ export default function App() {
             <TerminalView
               run={run}
               onRunAgain={runAgain}
-              onFinished={() => {
-                setRunning(false);
-                setFilesChanged((previous) => previous + 1);
-              }}
+              onFinished={finishRun}
+              statusExtra={
+                <HistoryMenu
+                  history={history}
+                  onRun={(entry) =>
+                    requestRun({ name: entry.name, isSequence: entry.isSequence, steps: entry.steps })
+                  }
+                  onClear={() =>
+                    clearHistory()
+                      .then(setHistory)
+                      .catch((error) => console.error(error))
+                  }
+                />
+              }
             />
           </div>
         </main>

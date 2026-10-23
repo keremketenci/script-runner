@@ -139,5 +139,23 @@
   },
   "layout": {
     "resizeTerminal": "Terminali boyutlandırmak için sürükle (çift tıklama sıfırlar)"
+  },
+  "history": {
+    "title": "Geçmiş",
+    "empty": "Henüz çalıştırma yok",
+    "runAgain": "Tekrar çalıştır",
+    "clear": "Geçmişi temizle",
+    "stopped": "durduruldu",
+    "failed": "başlatılamadı",
+    "exitCode": "kod {{code}}",
+    "failedAtStep": "{{number}}. adım, kod {{code}}",
+    "clearTitle": "Geçmiş temizlensin mi?",
+    "clearText_one": "{{count}} çalıştırma listeden silinecek. Scriptlerine dokunulmaz.",
+    "clearText_other": "{{count}} çalıştırma listeden silinecek. Scriptlerine dokunulmaz."
+  },
+  "crash": {
+    "title": "Bir şeyler ters gitti",
+    "text": "Pencerenin bir kısmı çöktü. Yeniden yüklemek genelde düzeltir; çalışan bir script durdurulur.",
+    "reload": "Yeniden yükle"
   }
 }

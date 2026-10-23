@@ -1,5 +1,6 @@
 mod browser;
 mod config;
+mod history;
 mod runner;
 mod session;
 
@@ -32,6 +33,9 @@ pub fn run() {
             config::delete_sequence,
             config::set_sequence_steps,
             config::add_sequence_step,
+            history::get_history,
+            history::record_run,
+            history::clear_history,
             session::start_session,
             session::write_to_session,
             session::resize_session,

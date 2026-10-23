@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 import { SettingsProvider } from "./settings/SettingsContext";
 import { applyTheme, loadSettings } from "./lib/settings";
 import "./index.css";
@@ -11,8 +12,10 @@ applyTheme(loadSettings().theme);
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
-    <SettingsProvider>
-      <App />
-    </SettingsProvider>
+    <ErrorBoundary>
+      <SettingsProvider>
+        <App />
+      </SettingsProvider>
+    </ErrorBoundary>
   </React.StrictMode>,
 );
