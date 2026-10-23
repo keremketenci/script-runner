@@ -1,6 +1,6 @@
 [package]
 name = "script-runner"
-version = "0.9.0"
+version = "0.9.1"
 description = "Browse and run your personal scripts from one place"
 authors = ["Kerem Ketenci"]
 edition = "2024"
