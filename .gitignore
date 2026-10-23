@@ -26,3 +26,12 @@ dist-ssr
 # Local AI assistant instructions and settings
 CLAUDE.md
 .claude/
+
+# Output written by the example scripts
+examples/**/failed_ips.txt
+examples/**/merged-logs.txt
+examples/**/merged_logs.txt
+examples/**/ban_list.txt
+
+# Real server logs used for local testing: they contain player names and IP addresses
+examples/**/logs.zip

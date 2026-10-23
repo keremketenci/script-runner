@@ -3,7 +3,8 @@
     "title": "Settings",
     "description": "Customize the app.",
     "language": "Language",
-    "theme": "Theme"
+    "theme": "Theme",
+    "startup": "On startup"
   },
   "theme": {
     "light": "Light",
@@ -13,6 +14,130 @@
   "terminal": {
     "startFailed": "Could not start the script: {{error}}",
     "exited": "Script exited with code {{code}}.",
-    "restart": "Restart"
+    "idle": "No script running. Right-click a script and choose Run.",
+    "clearHint": "Press Ctrl+C or Enter to clear.",
+    "stopped": "Stopped.",
+    "stepHeader": "Step {{number}}/{{total}}: {{name}}"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "save": "Save"
+  },
+  "folders": {
+    "title": "Script folders",
+    "add": "Add folder",
+    "pickTitle": "Choose a script folder",
+    "empty": "No script folders yet. Add one with the button above.",
+    "options": "Folder options",
+    "rename": "Rename",
+    "renameTitle": "Rename folder",
+    "changePath": "Change location",
+    "forget": "Forget",
+    "error": "Something went wrong: {{error}}",
+    "loadFailed": "Could not load the settings file: {{error}}"
+  },
+  "browser": {
+    "noFolder": "Add or select a script folder on the left.",
+    "back": "Back to the parent folder",
+    "showAll": "Show all files",
+    "listFailed": "Could not open this folder: {{error}}",
+    "emptyFolder": "This folder is empty.",
+    "noScripts": "No scripts here. Turn on \"Show all files\" to see everything.",
+    "chooseFolder": "Which script folder do you want to open?",
+    "search": "Search",
+    "searchPlaceholder": "Search in {{folder}}…",
+    "clearSearch": "Clear search",
+    "noResults": "Nothing found.",
+    "truncated": "Showing the first {{count}} results. Type more to narrow it down.",
+    "openInFileManager": "Open this folder in the file manager",
+    "refresh": "Refresh"
+  },
+  "startup": {
+    "lastLocation": "Open last location",
+    "ask": "Ask every time"
+  },
+  "viewer": {
+    "readOnly": "Read only",
+    "close": "Close preview",
+    "readFailed": "Could not read this file: {{error}}",
+    "binary": "This looks like a binary file (for example a compiled program), so it cannot be shown as text.",
+    "truncated": "The file is large; only the first {{size}} are shown."
+  },
+  "files": {
+    "run": "Run",
+    "reveal": "Open file location",
+    "rename": "Rename",
+    "renameTitle": "Rename in the app",
+    "renameHint": "Only the name shown in this app changes. The file stays \"{{name}}\" on disk.",
+    "restoreName": "Restore original name",
+    "runSettings": "Run settings…",
+    "addToSequence": "Add to sequence",
+    "noSequences": "No sequences yet"
+  },
+  "run": {
+    "replaceTitle": "A script is still running",
+    "replaceText": "\"{{running}}\" has not finished yet. Stop it and start \"{{next}}\"?",
+    "replaceConfirm": "Stop and run"
+  },
+  "status": {
+    "idle": "No script running",
+    "running": "Running",
+    "finished": "Exited with code {{code}}",
+    "stopped": "Stopped",
+    "failed": "Could not start",
+    "stop": "Stop",
+    "runAgain": "Run again",
+    "sequenceStep": "Step {{number}}/{{total}}: {{name}}",
+    "sequenceDone": "All {{total}} steps finished",
+    "sequenceFailed": "Stopped at step {{number}} (code {{code}})",
+    "sequenceStopped": "Stopped at step {{number}}",
+    "sequenceStartFailed": "Step {{number}} could not start"
+  },
+  "runSettings": {
+    "title": "Run settings",
+    "args": "Arguments",
+    "argsPlaceholder": "--input logs \"my file.txt\"",
+    "argsHint": "Added after the script path. Use quotes for values with spaces.",
+    "workingFolder": "Working folder",
+    "workingFolderHint": "Relative paths in the script start here. Empty means the script's own folder.",
+    "interpreter": "Interpreter",
+    "interpreterPlaceholder": "Automatic (by file extension)",
+    "interpreterHint": "A program name or full path, for example a virtual environment's python.",
+    "browse": "Browse",
+    "reset": "Clear all"
+  },
+  "sequences": {
+    "title": "Sequences",
+    "create": "New sequence",
+    "createTitle": "New sequence",
+    "empty": "No sequences yet. A sequence runs several scripts one after another.",
+    "options": "Sequence options",
+    "rename": "Rename",
+    "renameTitle": "Rename sequence",
+    "delete": "Delete",
+    "deleteTitle": "Delete sequence",
+    "deleteText": "\"{{name}}\" and its step list will be deleted. The scripts themselves stay untouched.",
+    "stepCount_one": "{{count}} step",
+    "stepCount_other": "{{count}} steps",
+    "noSteps": "No steps yet. Right-click a script in a folder and choose \"Add to sequence\".",
+    "missing": "File not found",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "removeStep": "Remove step",
+    "run": "Run sequence",
+    "fixMissing": "Some scripts are missing. Remove or replace them to run."
+  },
+  "quit": {
+    "title": "A script is still running",
+    "text": "\"{{name}}\" has not finished yet. Quitting stops it.",
+    "confirm": "Stop and quit"
+  },
+  "sidebar": {
+    "compact": "Compact sidebar",
+    "expand": "Full sidebar",
+    "resize": "Drag to resize the sidebar (double-click resets)"
+  },
+  "layout": {
+    "resizeTerminal": "Drag to resize the terminal (double-click resets)"
   }
 }

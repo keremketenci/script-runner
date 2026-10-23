@@ -3,7 +3,8 @@
     "title": "Ayarlar",
     "description": "Uygulamayı özelleştir.",
     "language": "Dil",
-    "theme": "Tema"
+    "theme": "Tema",
+    "startup": "Açılışta"
   },
   "theme": {
     "light": "Açık",
@@ -13,6 +14,130 @@
   "terminal": {
     "startFailed": "Script başlatılamadı: {{error}}",
     "exited": "Script {{code}} koduyla sonlandı.",
-    "restart": "Yeniden başlat"
+    "idle": "Çalışan script yok. Bir scripte sağ tıklayıp Çalıştır'ı seç.",
+    "clearHint": "Temizlemek için Ctrl+C veya Enter'a bas.",
+    "stopped": "Durduruldu.",
+    "stepHeader": "Adım {{number}}/{{total}}: {{name}}"
+  },
+  "common": {
+    "cancel": "İptal",
+    "save": "Kaydet"
+  },
+  "folders": {
+    "title": "Script klasörleri",
+    "add": "Klasör ekle",
+    "pickTitle": "Bir script klasörü seç",
+    "empty": "Henüz script klasörü yok. Yukarıdaki butonla ekleyebilirsin.",
+    "options": "Klasör seçenekleri",
+    "rename": "Yeniden adlandır",
+    "renameTitle": "Klasörü yeniden adlandır",
+    "changePath": "Konumu değiştir",
+    "forget": "Unut",
+    "error": "Bir sorun oluştu: {{error}}",
+    "loadFailed": "Ayar dosyası yüklenemedi: {{error}}"
+  },
+  "browser": {
+    "noFolder": "Soldan bir script klasörü ekle veya seç.",
+    "back": "Üst klasöre dön",
+    "showAll": "Tüm dosyaları göster",
+    "listFailed": "Bu klasör açılamadı: {{error}}",
+    "emptyFolder": "Bu klasör boş.",
+    "noScripts": "Burada script yok. Her şeyi görmek için \"Tüm dosyaları göster\"i aç.",
+    "chooseFolder": "Hangi script klasörünü açmak istersin?",
+    "search": "Ara",
+    "searchPlaceholder": "{{folder}} içinde ara…",
+    "clearSearch": "Aramayı temizle",
+    "noResults": "Hiçbir şey bulunamadı.",
+    "truncated": "İlk {{count}} sonuç gösteriliyor. Daraltmak için aramayı uzat.",
+    "openInFileManager": "Bu klasörü dosya yöneticisinde aç",
+    "refresh": "Yenile"
+  },
+  "startup": {
+    "lastLocation": "Son konumu aç",
+    "ask": "Her seferinde sor"
+  },
+  "viewer": {
+    "readOnly": "Salt okunur",
+    "close": "Önizlemeyi kapat",
+    "readFailed": "Bu dosya okunamadı: {{error}}",
+    "binary": "Bu bir ikili dosya gibi görünüyor (örneğin derlenmiş bir program), bu yüzden metin olarak gösterilemiyor.",
+    "truncated": "Dosya büyük; sadece ilk {{size}} gösteriliyor."
+  },
+  "files": {
+    "run": "Çalıştır",
+    "reveal": "Dosya konumunu aç",
+    "rename": "Yeniden adlandır",
+    "renameTitle": "Uygulamada yeniden adlandır",
+    "renameHint": "Sadece bu uygulamada görünen ad değişir. Dosyanın diskteki adı \"{{name}}\" olarak kalır.",
+    "restoreName": "Orijinal ada dön",
+    "runSettings": "Çalıştırma ayarları…",
+    "addToSequence": "Sequence'a ekle",
+    "noSequences": "Henüz sequence yok"
+  },
+  "run": {
+    "replaceTitle": "Bir script hâlâ çalışıyor",
+    "replaceText": "\"{{running}}\" henüz bitmedi. Durdurup \"{{next}}\" başlatılsın mı?",
+    "replaceConfirm": "Durdur ve çalıştır"
+  },
+  "status": {
+    "idle": "Çalışan script yok",
+    "running": "Çalışıyor",
+    "finished": "{{code}} koduyla bitti",
+    "stopped": "Durduruldu",
+    "failed": "Başlatılamadı",
+    "stop": "Durdur",
+    "runAgain": "Tekrar çalıştır",
+    "sequenceStep": "Adım {{number}}/{{total}}: {{name}}",
+    "sequenceDone": "{{total}} adımın hepsi bitti",
+    "sequenceFailed": "{{number}}. adımda durdu (kod {{code}})",
+    "sequenceStopped": "{{number}}. adımda durduruldu",
+    "sequenceStartFailed": "{{number}}. adım başlatılamadı"
+  },
+  "runSettings": {
+    "title": "Çalıştırma ayarları",
+    "args": "Argümanlar",
+    "argsPlaceholder": "--input logs \"my file.txt\"",
+    "argsHint": "Script yolundan sonra eklenir. Boşluk içeren değerler için tırnak kullan.",
+    "workingFolder": "Çalışma klasörü",
+    "workingFolderHint": "Scriptteki göreli yollar buradan başlar. Boş bırakırsan scriptin kendi klasörü kullanılır.",
+    "interpreter": "Yorumlayıcı",
+    "interpreterPlaceholder": "Otomatik (dosya uzantısına göre)",
+    "interpreterHint": "Bir program adı veya tam yol, örneğin bir sanal ortamın (venv) python'u.",
+    "browse": "Gözat",
+    "reset": "Hepsini temizle"
+  },
+  "sequences": {
+    "title": "Sequence'lar",
+    "create": "Yeni sequence",
+    "createTitle": "Yeni sequence",
+    "empty": "Henüz sequence yok. Bir sequence birkaç scripti sırayla çalıştırır.",
+    "options": "Sequence seçenekleri",
+    "rename": "Yeniden adlandır",
+    "renameTitle": "Sequence'ı yeniden adlandır",
+    "delete": "Sil",
+    "deleteTitle": "Sequence'ı sil",
+    "deleteText": "\"{{name}}\" ve adım listesi silinecek. Scriptlerin kendisine dokunulmaz.",
+    "stepCount_one": "{{count}} adım",
+    "stepCount_other": "{{count}} adım",
+    "noSteps": "Henüz adım yok. Bir klasördeki scripte sağ tıklayıp \"Sequence'a ekle\"yi seç.",
+    "missing": "Dosya bulunamadı",
+    "moveUp": "Yukarı taşı",
+    "moveDown": "Aşağı taşı",
+    "removeStep": "Adımı çıkar",
+    "run": "Sequence'ı çalıştır",
+    "fixMissing": "Bazı scriptler bulunamıyor. Çalıştırmak için onları çıkar veya değiştir."
+  },
+  "quit": {
+    "title": "Bir script hâlâ çalışıyor",
+    "text": "\"{{name}}\" henüz bitmedi. Çıkarsan durdurulacak.",
+    "confirm": "Durdur ve çık"
+  },
+  "sidebar": {
+    "compact": "Kompakt kenar çubuğu",
+    "expand": "Tam kenar çubuğu",
+    "resize": "Kenar çubuğunu boyutlandırmak için sürükle (çift tıklama sıfırlar)"
+  },
+  "layout": {
+    "resizeTerminal": "Terminali boyutlandırmak için sürükle (çift tıklama sıfırlar)"
   }
 }

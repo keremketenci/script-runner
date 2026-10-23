@@ -10,7 +10,7 @@ import {
   SheetTitle,
 } from "@/shadcn/ui/sheet";
 import { useSettings } from "@/settings/SettingsContext";
-import { LANGUAGES, LANGUAGE_NAMES, THEMES } from "@/lib/settings";
+import { LANGUAGES, LANGUAGE_NAMES, STARTUP_MODES, THEMES } from "@/lib/settings";
 
 export function SettingsPanel() {
   const { t } = useTranslation();
@@ -68,6 +68,22 @@ export function SettingsPanel() {
                     onClick={() => updateSettings({ theme })}
                   >
                     {t(`theme.${theme}`)}
+                  </Button>
+                ))}
+              </div>
+            </section>
+
+            <section className="space-y-2">
+              <h3 className="text-sm font-medium">{t("settings.startup")}</h3>
+              <div className="grid grid-cols-[repeat(auto-fit,minmax(9rem,1fr))] gap-2">
+                {STARTUP_MODES.map((startup) => (
+                  <Button
+                    key={startup}
+                    className="h-11"
+                    variant={settings.startup === startup ? "default" : "outline"}
+                    onClick={() => updateSettings({ startup })}
+                  >
+                    {t(`startup.${startup}`)}
                   </Button>
                 ))}
               </div>
